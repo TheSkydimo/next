@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 
 type BillingCycle = "MONTHLY" | "QUARTERLY" | "YEARLY";
 
+const CURRENCY_RATES: Record<
+  string,
+  {
+    label: string;
+    /** 1 单位该货币约等于多少 CNY，用于内部换算 */
+    toCNY: number;
+  }
+> = {
+  CNY: { label: "人民币（CNY）", toCNY: 1 },
+  USD: { label: "美元（USD）", toCNY: 7.2 },
+  EUR: { label: "欧元（EUR）", toCNY: 7.8 },
+};
+
 interface MembershipPlan {
   id: number;
   name: string;
@@ -33,11 +46,39 @@ function formatBillingCycle(cycle: BillingCycle) {
   }
 }
 
+function formatMoney(amount: number) {
+  return amount.toFixed(2);
+}
+
+function getPricePreview(priceMajor: number, currency: string) {
+  const config = CURRENCY_RATES[currency];
+
+  if (!config || priceMajor <= 0) {
+    return [];
+  }
+
+  const valueInCNY = priceMajor * config.toCNY;
+
+  const entries: string[] = [];
+
+  (Object.keys(CURRENCY_RATES) as Array<keyof typeof CURRENCY_RATES>).forEach(
+    (code) => {
+      if (code === currency) return;
+
+      const target = CURRENCY_RATES[code];
+      const targetMajor = valueInCNY / target.toCNY;
+      entries.push(`${formatMoney(targetMajor)} ${code}`);
+    },
+  );
+
+  return entries;
+}
+
 const initialForm: Omit<MembershipPlan, "id" | "isActive"> & {
   isActive: boolean;
 } = {
   name: "",
-  price: 9900,
+  price: 99,
   currency: "CNY",
   billingCycle: "MONTHLY",
   description: "",
@@ -106,12 +147,15 @@ export default function AdminPlansPage() {
       setSaving(true);
       setError(null);
 
+      const priceYuan = Number(form.price);
+      const priceInCents = Math.round(priceYuan * 100);
+
       const res = await fetch("/api/admin/membership/plans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
-          price: Number(form.price),
+          price: priceInCents,
           currency: form.currency,
           billingCycle: form.billingCycle,
           description: form.description || undefined,
@@ -135,6 +179,27 @@ export default function AdminPlansPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleCurrencyChange(nextCurrency: string) {
+    setForm((prev) => {
+      const prevRate = CURRENCY_RATES[prev.currency];
+      const nextRate = CURRENCY_RATES[nextCurrency];
+
+      if (!prevRate || !nextRate || prev.price <= 0) {
+        return { ...prev, currency: nextCurrency };
+      }
+
+      const priceInCNY = prev.price * prevRate.toCNY;
+      const nextPriceMajorRaw = priceInCNY / nextRate.toCNY;
+      const nextPriceMajor = Math.round(nextPriceMajorRaw * 100) / 100;
+
+      return {
+        ...prev,
+        currency: nextCurrency,
+          price: nextPriceMajor,
+      };
+    });
   }
 
   async function toggleActive(plan: MembershipPlan) {
@@ -346,7 +411,7 @@ export default function AdminPlansPage() {
               </label>
 
               <label style={{ display: "flex", flexDirection: "column" }}>
-                <span>价格（分）</span>
+                <span>价格（元）</span>
                 <input
                   type="number"
                   value={form.price}
@@ -354,7 +419,7 @@ export default function AdminPlansPage() {
                     handleFormChange("price", Number(e.target.value))
                   }
                   min={0}
-                  step={100}
+                  step={0.01}
                   required
                 />
               </label>
@@ -363,7 +428,7 @@ export default function AdminPlansPage() {
                 <span>币种</span>
                 <select
                   value={form.currency}
-                  onChange={(e) => handleFormChange("currency", e.target.value)}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
                   required
                 >
                   <option value="CNY">人民币（CNY）</option>
@@ -388,6 +453,29 @@ export default function AdminPlansPage() {
                   <option value="YEARLY">按年</option>
                 </select>
               </label>
+
+              {form.price > 0 && CURRENCY_RATES[form.currency] && (
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    fontSize: 12,
+                    color: "#666",
+                  }}
+                >
+                  参考汇率价（约）：
+                  <span>
+                    {" "}
+                    {formatMoney(form.price)} {form.currency}
+                  </span>
+                  {getPricePreview(form.price, form.currency).length > 0 && (
+                    <span>
+                      {" "}
+                      ≈{" "}
+                      {getPricePreview(form.price, form.currency).join(" / ")}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <label style={{ display: "flex", flexDirection: "column" }}>
                 <span>描述</span>
