@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "dev:cf": "wrangler dev --local",
-    "build:cf": "npx @cloudflare/next-on-pages@latest build"
+    "build:cf": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.0.1",
