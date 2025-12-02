@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type SubscriptionStatus = "ACTIVE" | "CANCELED" | "EXPIRED";
-type BillingCycle = "MONTHLY" | "YEARLY";
+type BillingCycle = "MONTHLY" | "QUARTERLY" | "YEARLY";
 
 interface Plan {
   id: number;
@@ -50,10 +50,12 @@ function formatStatus(status: SubscriptionStatus) {
   }
 }
 
-function formatCycle(cycle: BillingCycle) {
+function formatCycle(cycle: string) {
   switch (cycle) {
     case "MONTHLY":
       return "按月";
+    case "QUARTERLY":
+      return "按季度";
     case "YEARLY":
       return "按年";
     default:
@@ -315,8 +317,8 @@ export default function AccountSubscriptionPage() {
                         {plan.name}
                       </div>
                       <div>
-                        {plan.price / 100} {plan.currency} /{" "}
-                        {plan.billingCycle}
+                          {plan.price / 100} {plan.currency} /{" "}
+                          {formatCycle(plan.billingCycle)}
                       </div>
                       {plan.description && (
                         <div

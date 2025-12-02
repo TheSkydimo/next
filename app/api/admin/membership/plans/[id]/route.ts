@@ -95,10 +95,18 @@ export async function PATCH(
     if (payload.isActive !== undefined) data.isActive = payload.isActive;
 
     if (payload.billingCycle !== undefined) {
-      data.billingCycle =
-        payload.billingCycle === "YEARLY"
-          ? BillingCycle.YEARLY
-          : BillingCycle.MONTHLY;
+      switch (payload.billingCycle) {
+        case "YEARLY":
+          data.billingCycle = BillingCycle.YEARLY;
+          break;
+        case "QUARTERLY":
+          data.billingCycle = BillingCycle.QUARTERLY;
+          break;
+        case "MONTHLY":
+        default:
+          data.billingCycle = BillingCycle.MONTHLY;
+          break;
+      }
     }
 
     const updated = await updateMembershipPlan(id, data);

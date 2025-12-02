@@ -90,10 +90,20 @@ export async function POST(request: NextRequest) {
 
     const payload = parsed.data;
 
-    const billingCycle =
-      payload.billingCycle === "YEARLY"
-        ? BillingCycle.YEARLY
-        : BillingCycle.MONTHLY;
+    let billingCycle: BillingCycle;
+
+    switch (payload.billingCycle) {
+      case "YEARLY":
+        billingCycle = BillingCycle.YEARLY;
+        break;
+      case "QUARTERLY":
+        billingCycle = BillingCycle.QUARTERLY;
+        break;
+      case "MONTHLY":
+      default:
+        billingCycle = BillingCycle.MONTHLY;
+        break;
+    }
 
     const plan = await createMembershipPlan({
       name: payload.name,

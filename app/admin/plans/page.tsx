@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type BillingCycle = "MONTHLY" | "YEARLY";
+type BillingCycle = "MONTHLY" | "QUARTERLY" | "YEARLY";
 
 interface MembershipPlan {
   id: number;
@@ -18,6 +18,19 @@ interface ApiResponse<T> {
   code: string;
   data?: T;
   message?: string;
+}
+
+function formatBillingCycle(cycle: BillingCycle) {
+  switch (cycle) {
+    case "MONTHLY":
+      return "按月";
+    case "QUARTERLY":
+      return "按季度";
+    case "YEARLY":
+      return "按年";
+    default:
+      return cycle;
+  }
 }
 
 const initialForm: Omit<MembershipPlan, "id" | "isActive"> & {
@@ -268,7 +281,7 @@ export default function AdminPlansPage() {
                           textAlign: "center",
                         }}
                       >
-                        {plan.billingCycle === "MONTHLY" ? "按月" : "按年"}
+                        {formatBillingCycle(plan.billingCycle)}
                       </td>
                       <td
                         style={{
@@ -348,14 +361,15 @@ export default function AdminPlansPage() {
 
               <label style={{ display: "flex", flexDirection: "column" }}>
                 <span>币种</span>
-                <input
-                  type="text"
+                <select
                   value={form.currency}
-                  onChange={(e) =>
-                    handleFormChange("currency", e.target.value.toUpperCase())
-                  }
+                  onChange={(e) => handleFormChange("currency", e.target.value)}
                   required
-                />
+                >
+                  <option value="CNY">人民币（CNY）</option>
+                  <option value="USD">美元（USD）</option>
+                  <option value="EUR">欧元（EUR）</option>
+                </select>
               </label>
 
               <label style={{ display: "flex", flexDirection: "column" }}>
@@ -370,6 +384,7 @@ export default function AdminPlansPage() {
                   }
                 >
                   <option value="MONTHLY">按月</option>
+                  <option value="QUARTERLY">按季度</option>
                   <option value="YEARLY">按年</option>
                 </select>
               </label>

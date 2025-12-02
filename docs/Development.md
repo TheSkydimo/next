@@ -504,6 +504,7 @@ model MembershipPlan {
 
 enum BillingCycle {
   MONTHLY
+  QUARTERLY
   YEARLY
 }
 

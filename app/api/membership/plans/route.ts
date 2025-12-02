@@ -44,10 +44,20 @@ export async function POST(request: NextRequest) {
     const billingCycleValue =
       typeof body.billingCycle === "string" ? body.billingCycle : "MONTHLY";
 
-    const billingCycle =
-      billingCycleValue === "YEARLY"
-        ? BillingCycle.YEARLY
-        : BillingCycle.MONTHLY;
+    let billingCycle: BillingCycle;
+
+    switch (billingCycleValue) {
+      case "YEARLY":
+        billingCycle = BillingCycle.YEARLY;
+        break;
+      case "QUARTERLY":
+        billingCycle = BillingCycle.QUARTERLY;
+        break;
+      case "MONTHLY":
+      default:
+        billingCycle = BillingCycle.MONTHLY;
+        break;
+    }
 
     const description =
       typeof body.description === "string"
