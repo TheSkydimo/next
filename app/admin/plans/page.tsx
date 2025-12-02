@@ -50,7 +50,10 @@ function formatMoney(amount: number) {
   return amount.toFixed(2);
 }
 
-function getPricePreview(priceMajor: number, currency: string) {
+function getPricePreview(
+  priceMajor: number,
+  currency: string,
+): Array<{ code: string; value: number }> {
   const config = CURRENCY_RATES[currency];
 
   if (!config || priceMajor <= 0) {
@@ -59,15 +62,13 @@ function getPricePreview(priceMajor: number, currency: string) {
 
   const valueInCNY = priceMajor * config.toCNY;
 
-  const entries: string[] = [];
+  const entries: Array<{ code: string; value: number }> = [];
 
   (Object.keys(CURRENCY_RATES) as Array<keyof typeof CURRENCY_RATES>).forEach(
     (code) => {
-      if (code === currency) return;
-
       const target = CURRENCY_RATES[code];
       const targetMajor = valueInCNY / target.toCNY;
-      entries.push(`${formatMoney(targetMajor)} ${code}`);
+      entries.push({ code, value: parseFloat(formatMoney(targetMajor)) });
     },
   );
 
@@ -92,6 +93,7 @@ export default function AdminPlansPage() {
   const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [showRates, setShowRates] = useState(false);
 
   async function loadPlans() {
     try {
@@ -429,11 +431,10 @@ export default function AdminPlansPage() {
                 <select
                   value={form.currency}
                   onChange={(e) => handleCurrencyChange(e.target.value)}
+                  disabled
                   required
                 >
                   <option value="CNY">人民币（CNY）</option>
-                  <option value="USD">美元（USD）</option>
-                  <option value="EUR">欧元（EUR）</option>
                 </select>
               </label>
 
@@ -453,29 +454,6 @@ export default function AdminPlansPage() {
                   <option value="YEARLY">按年</option>
                 </select>
               </label>
-
-              {form.price > 0 && CURRENCY_RATES[form.currency] && (
-                <div
-                  style={{
-                    gridColumn: "1 / -1",
-                    fontSize: 12,
-                    color: "#666",
-                  }}
-                >
-                  参考汇率价（约）：
-                  <span>
-                    {" "}
-                    {formatMoney(form.price)} {form.currency}
-                  </span>
-                  {getPricePreview(form.price, form.currency).length > 0 && (
-                    <span>
-                      {" "}
-                      ≈{" "}
-                      {getPricePreview(form.price, form.currency).join(" / ")}
-                    </span>
-                  )}
-                </div>
-              )}
 
               <label style={{ display: "flex", flexDirection: "column" }}>
                 <span>描述</span>
@@ -513,6 +491,51 @@ export default function AdminPlansPage() {
               >
                 {saving ? "创建中..." : "创建套餐"}
               </button>
+
+              {form.price > 0 && (
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    fontSize: 12,
+                    color: "#666",
+                    borderTop: "1px dashed #ddd",
+                    paddingTop: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowRates((prev) => !prev)}
+                    style={{
+                      padding: 0,
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      fontSize: 12,
+                      color: "#666",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <span>{showRates ? "收起汇率参考价" : "展开汇率参考价（约）"}</span>
+                    <span style={{ fontSize: 10 }}>
+                      {showRates ? "▲" : "▼"}
+                    </span>
+                  </button>
+
+                  {showRates && (
+                    <div style={{ marginTop: 4, lineHeight: 1.6 }}>
+                      {getPricePreview(form.price, "CNY").map((item) => (
+                        <div key={item.code}>
+                          {CURRENCY_RATES[item.code]?.label ?? item.code}：
+                          {formatMoney(item.value)} {item.code}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </form>
           </section>
         </>
