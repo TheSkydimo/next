@@ -33,6 +33,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "prisma": "6.19.0",
-    "typescript": "latest"
+    "typescript": "latest",
+    "wrangler": "^4.51.0"
   }
 }
