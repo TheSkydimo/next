@@ -7,7 +7,9 @@
     "build": "next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:cf": "wrangler dev --local",
+    "build:cf": "npx @cloudflare/next-on-pages@latest build"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.0.1",
@@ -18,13 +20,14 @@
     "better-sqlite3": "^12.5.0",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.5",
-    "next": "^15.5.6",
+    "next": "^15.5.2",
     "nodemailer": "^7.0.11",
     "react": "latest",
     "react-dom": "latest",
     "zod": "latest"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@types/node": "latest",
     "@types/nodemailer": "^7.0.4",
     "@types/react": "latest",

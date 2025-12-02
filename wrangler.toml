@@ -2,7 +2,7 @@ name = "membership-app"
 compatibility_date = "2024-11-01"
 
 [[d1_databases]]
-binding = "DB"                # 之后代码里通过 env.DB 访问
+binding = "Database"                # 之后代码里通过 env..Database 访问
 database_name = "membership-db" # 上一步创建的名字
 database_id = "472a47a5-caf7-4317-9eb4-0316de0586f4"
 jurisdiction = "eu"
