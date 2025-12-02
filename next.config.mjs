@@ -1,12 +1,14 @@
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-
-initOpenNextCloudflareForDev({
-  // 与 wrangler 本地状态目录保持一致，便于在 next dev 时访问 D1 等绑定
-  persist: { path: ".wrangler/state" },
-});
+import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+};
 
 export default nextConfig;
 
+// 仅在本地开发时模拟 Cloudflare 运行时（D1、环境变量等）
+if (process.env.NODE_ENV === "development") {
+  await setupDevPlatform();
+}
