@@ -11,7 +11,14 @@ import {
   type MembershipPlanUpdateInput,
 } from "@/lib/utils/membershipValidators";
 
-function requireAdmin(requestCookies: Awaited<ReturnType<typeof cookies>>) {
+type AdminAuthSuccess = { userId: number };
+type AdminAuthError = {
+  error: { status: number; body: { code: string; message: string } };
+};
+
+function requireAdmin(
+  requestCookies: Awaited<ReturnType<typeof cookies>>,
+): AdminAuthSuccess | AdminAuthError {
   const token = requestCookies.get("auth_token")?.value;
 
   if (!token) {
@@ -42,7 +49,7 @@ function requireAdmin(requestCookies: Awaited<ReturnType<typeof cookies>>) {
 }
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function PATCH(
@@ -54,10 +61,12 @@ export async function PATCH(
     const auth = requireAdmin(cookieStore);
 
     if ("error" in auth) {
-      return NextResponse.json(auth.error.body, { status: auth.error.status });
+      const { error } = auth;
+      return NextResponse.json(error.body, { status: error.status });
     }
 
-    const id = Number(params.id);
+    const { id: idStr } = await params;
+    const id = Number(idStr);
 
     if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json(
@@ -130,7 +139,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       return NextResponse.json(auth.error.body, { status: auth.error.status });
     }
 
-    const id = Number(params.id);
+    const { id: idStr } = await params;
+    const id = Number(idStr);
 
     if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json(

@@ -10,9 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@prisma/client": "6.19.0",
     "@prisma/adapter-better-sqlite3": "^7.0.1",
     "@prisma/adapter-mariadb": "^7.0.1",
+    "@prisma/client": "6.19.0",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "latest",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "cross-env": "^10.1.0",

@@ -4,7 +4,7 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { requestRefundForUser } from "@/lib/services/orderService";
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function POST(_request: NextRequest, { params }: RouteParams) {
@@ -21,7 +21,8 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
 
     const payload = verifyAuthToken(token);
 
-    const orderId = Number(params.id);
+    const { id: idStr } = await params;
+    const orderId = Number(idStr);
 
     if (!Number.isInteger(orderId) || orderId <= 0) {
       return NextResponse.json(

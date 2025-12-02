@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { ReactElement } from "react";
-
-type CheckoutPageProps = {
-  searchParams: { planId?: string };
-};
 
 interface CreateOrderResponse {
   code: string;
@@ -17,10 +14,9 @@ interface CreateOrderResponse {
   message?: string;
 }
 
-export default function CheckoutPage({
-  searchParams,
-}: CheckoutPageProps): ReactElement {
-  const planId = searchParams?.planId;
+function CheckoutPageContent(): ReactElement {
+  const searchParams = useSearchParams();
+  const planId = searchParams.get("planId") ?? undefined;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderNo, setOrderNo] = useState<string | null>(null);
@@ -142,5 +138,20 @@ export default function CheckoutPage({
         </section>
       )}
     </main>
+  );
+}
+
+export default function CheckoutPage(): ReactElement {
+  return (
+    <Suspense
+      fallback={
+        <main style={{ maxWidth: 640, margin: "40px auto", padding: "0 16px" }}>
+          <h1>结算页</h1>
+          <p>加载中...</p>
+        </main>
+      }
+    >
+      <CheckoutPageContent />
+    </Suspense>
   );
 }

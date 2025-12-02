@@ -11,7 +11,14 @@ import {
   type MembershipPlanCreateInput,
 } from "@/lib/utils/membershipValidators";
 
-function requireAdmin(requestCookies: Awaited<ReturnType<typeof cookies>>) {
+type AdminAuthSuccess = { userId: number };
+type AdminAuthError = {
+  error: { status: number; body: { code: string; message: string } };
+};
+
+function requireAdmin(
+  requestCookies: Awaited<ReturnType<typeof cookies>>,
+): AdminAuthSuccess | AdminAuthError {
   const token = requestCookies.get("auth_token")?.value;
 
   if (!token) {
@@ -47,7 +54,8 @@ export async function GET() {
     const auth = requireAdmin(cookieStore);
 
     if ("error" in auth) {
-      return NextResponse.json(auth.error.body, { status: auth.error.status });
+      const { error } = auth;
+      return NextResponse.json(error.body, { status: error.status });
     }
 
     const plans = await getAllPlans();
@@ -68,7 +76,8 @@ export async function POST(request: NextRequest) {
     const auth = requireAdmin(cookieStore);
 
     if ("error" in auth) {
-      return NextResponse.json(auth.error.body, { status: auth.error.status });
+      const { error } = auth;
+      return NextResponse.json(error.body, { status: error.status });
     }
 
     const json = (await request.json().catch(() => null)) as

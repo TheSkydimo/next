@@ -4,12 +4,17 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { approveRefundForOrder } from "@/lib/services/orderService";
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+};
+
+type AdminAuthSuccess = { userId: number };
+type AdminAuthError = {
+  error: { status: number; body: { code: string; message: string } };
 };
 
 function requireAdmin(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
-) {
+): AdminAuthSuccess | AdminAuthError {
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) {
@@ -56,7 +61,8 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    const orderId = Number(params.id);
+    const { id: idStr } = await params;
+    const orderId = Number(idStr);
 
     if (!Number.isInteger(orderId) || orderId <= 0) {
       return NextResponse.json(
