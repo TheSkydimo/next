@@ -66,7 +66,7 @@ export default function AccountProfilePage() {
           return;
         }
 
-        const data: ApiResponse<CurrentUser> = await res.json();
+        const data = (await res.json()) as ApiResponse<CurrentUser>;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           if (!cancelled) {
@@ -111,7 +111,7 @@ export default function AccountProfilePage() {
         body: JSON.stringify({ name: name.trim() || undefined }),
       });
 
-      const data: ApiResponse<CurrentUser> = await res.json();
+      const data = (await res.json()) as ApiResponse<CurrentUser>;
 
       if (!res.ok || data.code !== "OK") {
         let message = data.message;
@@ -164,7 +164,7 @@ export default function AccountProfilePage() {
         }),
       });
 
-      const data: ApiResponse = await res.json();
+      const data = (await res.json()) as ApiResponse;
 
       if (!res.ok || data.code !== "OK") {
         setPasswordError(data.message ?? "修改密码失败");
@@ -205,7 +205,7 @@ export default function AccountProfilePage() {
         }),
       });
 
-      const data: ApiResponse = await res.json();
+      const data = (await res.json()) as ApiResponse;
 
       if (!res.ok || data.code !== "OK") {
         setEmailError(data.message ?? "请求修改邮箱失败");
@@ -250,7 +250,7 @@ export default function AccountProfilePage() {
         }),
       });
 
-      const data: ApiResponse<CurrentUser> = await res.json();
+      const data = (await res.json()) as ApiResponse<CurrentUser>;
 
       if (!res.ok || data.code !== "OK") {
         setEmailError(data.message ?? "邮箱修改失败");

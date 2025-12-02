@@ -113,7 +113,7 @@ export default function AdminPlansPage() {
         return;
       }
 
-      const data: ApiResponse<MembershipPlan[]> = await res.json();
+      const data = (await res.json()) as ApiResponse<MembershipPlan[]>;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "获取套餐列表失败");
@@ -165,9 +165,9 @@ export default function AdminPlansPage() {
         }),
       });
 
-      const data: ApiResponse<MembershipPlan> = await res.json().catch(
+      const data = (await res.json().catch(
         () => ({} as ApiResponse<MembershipPlan>),
-      );
+      )) as ApiResponse<MembershipPlan>;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "创建套餐失败");
@@ -215,9 +215,9 @@ export default function AdminPlansPage() {
         body: JSON.stringify({ isActive: !plan.isActive }),
       });
 
-      const data: ApiResponse<MembershipPlan> = await res.json().catch(
+      const data = (await res.json().catch(
         () => ({} as ApiResponse<MembershipPlan>),
-      );
+      )) as ApiResponse<MembershipPlan>;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "更新套餐状态失败");
@@ -245,9 +245,9 @@ export default function AdminPlansPage() {
         method: "DELETE",
       });
 
-      const data: ApiResponse<unknown> = await res.json().catch(
+      const data = (await res.json().catch(
         () => ({} as ApiResponse<unknown>),
-      );
+      )) as ApiResponse<unknown>;
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "删除套餐失败");

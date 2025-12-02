@@ -1,0 +1,43 @@
+{
+  "name": "membership-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "postinstall": "prisma generate",
+    "start": "next start",
+    "lint": "next lint",
+    "dev:cf": "opennextjs-cloudflare preview",
+    "build:cf": "opennextjs-cloudflare build",
+    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.11.0",
+    "@prisma/adapter-better-sqlite3": "^7.0.1",
+    "@prisma/adapter-mariadb": "^7.0.1",
+    "@prisma/client": "6.19.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "mariadb": "^3.4.5",
+    "next": "14.2.3",
+    "nodemailer": "^7.0.11",
+    "react": "latest",
+    "react-dom": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/nodemailer": "^7.0.4",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "cross-env": "^10.1.0",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "prisma": "6.19.0",
+    "typescript": "latest",
+    "wrangler": "^4.51.0"
+  }
+}

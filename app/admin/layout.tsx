@@ -12,7 +12,7 @@ async function logoutRequest(): Promise<boolean> {
       return false;
     }
 
-    const data = await res.json().catch(() => null);
+    const data = (await res.json().catch(() => null)) as { code?: string } | null;
     return data?.code === "OK";
   } catch {
     return false;

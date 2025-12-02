@@ -58,7 +58,16 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, password, name }),
       });
 
-      const data = await res.json();
+      const data = (await res
+        .json()
+        .catch(() => ({}))) as {
+        message?: string;
+        code?: string;
+        errors?: {
+          fieldErrors?: Record<string, string[]>;
+          formErrors?: string[];
+        };
+      };
 
       if (!res.ok) {
         let message: string | undefined = data.message;
@@ -114,7 +123,9 @@ export default function RegisterPage() {
         body: JSON.stringify({ email: registeredEmail, code: verifyCode.trim() }),
       });
 
-      const data = await res.json();
+      const data = (await res
+        .json()
+        .catch(() => ({}))) as { message?: string; code?: string };
 
       if (!res.ok) {
         setError(data.message ?? "激活失败，请稍后重试");

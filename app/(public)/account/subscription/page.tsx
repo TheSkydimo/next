@@ -92,7 +92,7 @@ export default function AccountSubscriptionPage() {
           return;
         }
 
-        const data: SubscriptionsResponse = await res.json();
+        const data = (await res.json()) as SubscriptionsResponse;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           if (!cancelled) {
@@ -144,7 +144,7 @@ export default function AccountSubscriptionPage() {
           return;
         }
 
-        const data: Plan[] = await res.json();
+        const data = (await res.json()) as Plan[];
 
         if (!cancelled) {
           setPlans(data);

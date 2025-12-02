@@ -34,9 +34,9 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data: LoginResponse = await res.json().catch(
+      const data = (await res.json().catch(
         () => ({ code: "UNKNOWN" }) as LoginResponse,
-      );
+      )) as LoginResponse;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "登录失败");

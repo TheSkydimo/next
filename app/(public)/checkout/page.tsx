@@ -48,7 +48,7 @@ function CheckoutPageContent(): ReactElement {
         return;
       }
 
-      const data: CreateOrderResponse = await res.json();
+      const data = (await res.json()) as CreateOrderResponse;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "创建订单失败，请稍后重试");

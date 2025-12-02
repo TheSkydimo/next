@@ -37,7 +37,10 @@ export default function AccountPage() {
           return;
         }
 
-        const data = await res.json();
+        const data = (await res.json().catch(() => ({}))) as {
+          message?: string;
+          data?: CurrentUser;
+        };
 
         if (!res.ok) {
           if (!cancelled) {

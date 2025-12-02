@@ -44,7 +44,7 @@ export default function AdminForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
 
-      const data: ApiResponse = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as ApiResponse;
 
       if (!res.ok) {
         setError(data.message ?? "发送重置邮件失败");
@@ -87,7 +87,7 @@ export default function AdminForgotPasswordPage() {
         body: JSON.stringify({ email, code: code.trim(), newPassword }),
       });
 
-      const data: ApiResponse = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as ApiResponse;
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "重置密码失败");

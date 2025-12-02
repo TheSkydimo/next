@@ -69,9 +69,9 @@ export default function AdminOrdersPage() {
           return;
         }
 
-        const data: OrdersResponse = await res
+        const data = (await res
           .json()
-          .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse));
+          .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse))) as OrdersResponse;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           setError(data.message ?? "获取订单列表失败");
@@ -110,9 +110,12 @@ export default function AdminOrdersPage() {
         method: "POST",
       });
 
-      const data: { code: string; message?: string } = await res
+      const data = (await res
         .json()
-        .catch(() => ({ code: "UNKNOWN_ERROR" }));
+        .catch(() => ({ code: "UNKNOWN_ERROR" }))) as {
+        code: string;
+        message?: string;
+      };
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "同意退款失败");

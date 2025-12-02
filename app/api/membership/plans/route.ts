@@ -29,7 +29,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => ({} as Record<string, unknown>));
+    const body = (await request
+      .json()
+      .catch(() => ({} as Record<string, unknown>))) as Record<string, unknown>;
 
     const name =
       (typeof body.name === "string" && body.name.trim()) ||

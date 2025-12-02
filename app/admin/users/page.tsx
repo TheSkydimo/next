@@ -75,9 +75,9 @@ export default function AdminUsersPage() {
           return;
         }
 
-        const data: ApiResponse<AdminUser[]> = await res
+        const data = (await res
           .json()
-          .catch(() => ({} as ApiResponse<AdminUser[]>));
+          .catch(() => ({} as ApiResponse<AdminUser[]>))) as ApiResponse<AdminUser[]>;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           setError(data.message ?? "获取用户列表失败");
@@ -120,9 +120,9 @@ export default function AdminUsersPage() {
         body: JSON.stringify({ role: nextRole }),
       });
 
-      const data: ApiResponse<AdminUser> = await res
+      const data = (await res
         .json()
-        .catch(() => ({} as ApiResponse<AdminUser>));
+        .catch(() => ({} as ApiResponse<AdminUser>))) as ApiResponse<AdminUser>;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "更新用户角色失败");
@@ -157,9 +157,9 @@ export default function AdminUsersPage() {
         method: "DELETE",
       });
 
-      const data: ApiResponse<unknown> = await res
+      const data = (await res
         .json()
-        .catch(() => ({} as ApiResponse<unknown>));
+        .catch(() => ({} as ApiResponse<unknown>))) as ApiResponse<unknown>;
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "删除用户失败");
@@ -386,11 +386,11 @@ export default function AdminUsersPage() {
                       const res = await fetch(
                         `/api/admin/users?page=${page - 1}`,
                       );
-                      const data: ApiResponse<AdminUser[]> = await res
+                      const data = (await res
                         .json()
                         .catch(
                           () => ({ code: "UNKNOWN_ERROR" } as ApiResponse<AdminUser[]>),
-                        );
+                        )) as ApiResponse<AdminUser[]>;
 
                       if (!res.ok || data.code !== "OK" || !data.data) {
                         setError(data.message ?? "获取用户列表失败");
@@ -423,11 +423,11 @@ export default function AdminUsersPage() {
                       const res = await fetch(
                         `/api/admin/users?page=${page + 1}`,
                       );
-                      const data: ApiResponse<AdminUser[]> = await res
+                      const data = (await res
                         .json()
                         .catch(
                           () => ({ code: "UNKNOWN_ERROR" } as ApiResponse<AdminUser[]>),
-                        );
+                        )) as ApiResponse<AdminUser[]>;
 
                       if (!res.ok || data.code !== "OK" || !data.data) {
                         setError(data.message ?? "获取用户列表失败");

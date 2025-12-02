@@ -87,7 +87,7 @@ export default function AccountOrdersPage() {
           return;
         }
 
-        const data: OrdersResponse = await res.json();
+        const data = (await res.json()) as OrdersResponse;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           if (!cancelled) {
@@ -138,9 +138,9 @@ export default function AccountOrdersPage() {
         method: "POST",
       });
 
-      const data: OrdersResponse = await res
+      const data = (await res
         .json()
-        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse));
+        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse))) as OrdersResponse;
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "取消订单失败，请稍后重试");
@@ -183,9 +183,9 @@ export default function AccountOrdersPage() {
         },
       );
 
-      const data: OrdersResponse = await res
+      const data = (await res
         .json()
-        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse));
+        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse))) as OrdersResponse;
 
       if (!res.ok || data.code !== "OK") {
         setError(data.message ?? "申请退款失败，请稍后重试");

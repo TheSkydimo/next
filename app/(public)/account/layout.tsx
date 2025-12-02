@@ -21,7 +21,9 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+        const data = (await res
+          .json()
+          .catch(() => ({}))) as { message?: string };
         setLogoutError(data.message ?? "退出登录失败，请稍后重试");
         return;
       }

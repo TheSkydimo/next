@@ -42,9 +42,9 @@ export default function AdminAdminsPage() {
           return;
         }
 
-        const data: ApiResponse<AdminInfo[]> = await res
+        const data = (await res
           .json()
-          .catch(() => ({} as ApiResponse<AdminInfo[]>));
+          .catch(() => ({} as ApiResponse<AdminInfo[]>))) as ApiResponse<AdminInfo[]>;
 
         if (!res.ok || data.code !== "OK" || !data.data) {
           setError(data.message ?? "获取管理员列表失败");
@@ -81,9 +81,9 @@ export default function AdminAdminsPage() {
         body: JSON.stringify({ role: "USER" }),
       });
 
-      const data: ApiResponse<AdminInfo> = await res
+      const data = (await res
         .json()
-        .catch(() => ({} as ApiResponse<AdminInfo>));
+        .catch(() => ({} as ApiResponse<AdminInfo>))) as ApiResponse<AdminInfo>;
 
       if (!res.ok || data.code !== "OK" || !data.data) {
         setError(data.message ?? "更新管理员角色失败");
