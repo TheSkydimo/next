@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 import { prisma } from "@/lib/db";
+import { SubscriptionStatus } from "@/app/generated/prisma/client";
 
 type AdminAuthSuccess = { userId: number };
 type AdminAuthError = {
@@ -143,15 +144,24 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    const now = new Date();
+
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
-        _count: {
-          select: {
-            orders: true,
-            subscriptions: true,
+        subscriptions: {
+          where: {
+            status: SubscriptionStatus.ACTIVE,
+            endAt: {
+              gt: now,
+            },
           },
+          select: {
+            id: true,
+            endAt: true,
+          },
+          take: 1,
         },
       },
     });
@@ -163,11 +173,13 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    if (user._count.orders > 0 || user._count.subscriptions > 0) {
+    const hasActiveSubscription = user.subscriptions.length > 0;
+
+    if (hasActiveSubscription) {
       return NextResponse.json(
         {
-          code: "HAS_DATA",
-          message: "该用户存在订单或订阅记录，暂不允许直接删除",
+          code: "HAS_ACTIVE_SUBSCRIPTION",
+          message: "该用户当前仍在订阅期内，暂不允许删除",
         },
         { status: 400 },
       );

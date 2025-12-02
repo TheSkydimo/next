@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type OrderStatus = "PENDING" | "PAID" | "CANCELED" | "REFUNDED";
+type OrderStatus =
+  | "PENDING"
+  | "PAID"
+  | "CANCELED"
+  | "REFUND_REQUESTED"
+  | "REFUNDED";
 type PaymentChannel = "ALIPAY" | "WECHAT" | "STRIPE" | "PAYPAL";
 
 interface OrderItem {
@@ -32,6 +37,8 @@ function formatStatus(status: OrderStatus) {
       return "已支付";
     case "CANCELED":
       return "已取消";
+    case "REFUND_REQUESTED":
+      return "退款申请中";
     case "REFUNDED":
       return "已退款";
     default:
@@ -58,6 +65,7 @@ export default function AccountOrdersPage() {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -108,6 +116,95 @@ export default function AccountOrdersPage() {
       cancelled = true;
     };
   }, []);
+
+  async function handleCancel(order: OrderItem) {
+    if (order.status !== "PENDING") {
+      return;
+    }
+
+    const ok = window.confirm(
+      `确定要取消订单「${order.orderNo}」吗？取消后需要重新下单才能继续支付。`,
+    );
+
+    if (!ok) {
+      return;
+    }
+
+    try {
+      setUpdatingId(order.id);
+      setError(null);
+
+      const res = await fetch(`/api/account/orders/${order.id}/cancel`, {
+        method: "POST",
+      });
+
+      const data: OrdersResponse = await res
+        .json()
+        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse));
+
+      if (!res.ok || data.code !== "OK") {
+        setError(data.message ?? "取消订单失败，请稍后重试");
+        return;
+      }
+
+      setOrders((prev) =>
+        prev.map((item) =>
+          item.id === order.id ? { ...item, status: "CANCELED" } : item,
+        ),
+      );
+    } catch {
+      setError("网络错误，取消订单失败，请稍后重试");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleRefundRequest(order: OrderItem) {
+    if (order.status !== "PAID") {
+      return;
+    }
+
+    const ok = window.confirm(
+      `确定要为订单「${order.orderNo}」申请退款吗？提交后将由管理员审核。`,
+    );
+
+    if (!ok) {
+      return;
+    }
+
+    try {
+      setUpdatingId(order.id);
+      setError(null);
+
+      const res = await fetch(
+        `/api/account/orders/${order.id}/refund-request`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data: OrdersResponse = await res
+        .json()
+        .catch(() => ({ code: "UNKNOWN_ERROR" } as OrdersResponse));
+
+      if (!res.ok || data.code !== "OK") {
+        setError(data.message ?? "申请退款失败，请稍后重试");
+        return;
+      }
+
+      setOrders((prev) =>
+        prev.map((item) =>
+          item.id === order.id
+            ? { ...item, status: "REFUND_REQUESTED" }
+            : item,
+        ),
+      );
+    } catch {
+      setError("网络错误，申请退款失败，请稍后重试");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   return (
     <div>
@@ -176,7 +273,40 @@ export default function AccountOrdersPage() {
                 {order.amount} {order.currency}
               </div>
 
-              <div>{formatStatus(order.status)}</div>
+              <div>
+                <div>{formatStatus(order.status)}</div>
+                {order.status === "PENDING" && (
+                  <button
+                    type="button"
+                    style={{ marginTop: 8, fontSize: 12 }}
+                    disabled={updatingId === order.id}
+                    onClick={() => void handleCancel(order)}
+                  >
+                    取消订单
+                  </button>
+                )}
+                {order.status === "PAID" && (
+                  <button
+                    type="button"
+                    style={{ marginTop: 8, fontSize: 12 }}
+                    disabled={updatingId === order.id}
+                    onClick={() => void handleRefundRequest(order)}
+                  >
+                    申请退款
+                  </button>
+                )}
+                {order.status === "REFUND_REQUESTED" && (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      fontSize: 12,
+                      color: "#c67",
+                    }}
+                  >
+                    已提交退款申请，等待管理员处理
+                  </div>
+                )}
+              </div>
 
               <div style={{ color: "#555" }}>
                 <div>

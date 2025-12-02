@@ -25,6 +25,21 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+function canDeleteUser(user: AdminUser) {
+  if (!user.activeSubscription) {
+    return true;
+  }
+
+  if (user.activeSubscription.status !== "ACTIVE") {
+    return true;
+  }
+
+  const now = new Date();
+  const endAt = new Date(user.activeSubscription.endAt);
+
+  return endAt <= now;
+}
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,8 +128,8 @@ export default function AdminUsersPage() {
   }
 
   async function handleDelete(user: AdminUser) {
-    if (user.subscriptionsCount > 0 || user.ordersCount > 0) {
-      setError("该用户存在订单或订阅记录，暂不允许直接删除");
+    if (!canDeleteUser(user)) {
+      setError("该用户当前仍在订阅期内，暂不允许删除");
       return;
     }
 
@@ -321,9 +336,7 @@ export default function AdminUsersPage() {
                     type="button"
                     style={{ marginLeft: 8, color: "red" }}
                     disabled={
-                      updatingId === user.id ||
-                      user.subscriptionsCount > 0 ||
-                      user.ordersCount > 0
+                      updatingId === user.id || !canDeleteUser(user)
                     }
                     onClick={() => void handleDelete(user)}
                   >
