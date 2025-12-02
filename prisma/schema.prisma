@@ -58,7 +58,7 @@ enum BillingCycle {
 
 model UserSubscription {
   id        Int                 @id @default(autoincrement())
-  user      User                @relation(fields: [userId], references: [id])
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   plan      MembershipPlan      @relation(fields: [planId], references: [id])
   planId    Int
@@ -81,7 +81,7 @@ enum SubscriptionStatus {
 model Order {
   id             Int             @id @default(autoincrement())
   orderNo        String          @unique
-  user           User            @relation(fields: [userId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         Int
   plan           MembershipPlan  @relation(fields: [planId], references: [id])
   planId         Int

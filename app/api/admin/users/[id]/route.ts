@@ -47,7 +47,7 @@ function requireAdmin(
 }
 
 type RouteParams = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
@@ -62,7 +62,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    const id = Number(params.id);
+    const { id: idStr } = await params;
+    const id = Number(idStr);
 
     if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json(
@@ -128,7 +129,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    const id = Number(params.id);
+    const { id: idStr } = await params;
+    const id = Number(idStr);
 
     if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json(
@@ -185,9 +187,18 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    await prisma.user.delete({
-      where: { id },
-    });
+    // 保险起见，先清理该用户的关联数据，再删除用户，避免外键约束错误
+    await prisma.$transaction([
+      prisma.userSubscription.deleteMany({
+        where: { userId: id },
+      }),
+      prisma.order.deleteMany({
+        where: { userId: id },
+      }),
+      prisma.user.delete({
+        where: { id },
+      }),
+    ]);
 
     return NextResponse.json({ code: "OK" }, { status: 200 });
   } catch (error) {

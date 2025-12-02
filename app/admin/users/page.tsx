@@ -19,10 +19,18 @@ interface AdminUser {
   } | null;
 }
 
+interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
 interface ApiResponse<T> {
   code: string;
   data?: T;
   message?: string;
+  meta?: PaginationMeta;
 }
 
 function canDeleteUser(user: AdminUser) {
@@ -45,14 +53,16 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    async function loadUsers() {
+    async function loadUsers(targetPage: number) {
       try {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("/api/admin/users");
+        const res = await fetch(`/api/admin/users?page=${targetPage}`);
 
         if (res.status === 401 || res.status === 403) {
           const text = await res.text();
@@ -75,6 +85,8 @@ export default function AdminUsersPage() {
         }
 
         setUsers(data.data);
+        setPage(data.meta?.page ?? targetPage);
+        setTotalPages(data.meta?.totalPages ?? 1);
       } catch {
         setError("网络错误，获取用户列表失败");
       } finally {
@@ -82,7 +94,7 @@ export default function AdminUsersPage() {
       }
     }
 
-    void loadUsers();
+    void loadUsers(1);
   }, []);
 
   async function toggleRole(user: AdminUser) {
@@ -177,17 +189,18 @@ export default function AdminUsersPage() {
       ) : users.length === 0 ? (
         <p style={{ marginTop: 12 }}>暂无用户数据。</p>
       ) : (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: 12,
-            fontSize: 14,
-          }}
-        >
+        <>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginTop: 12,
+              fontSize: 14,
+            }}
+          >
           <thead>
             <tr>
-              <th style={{ borderBottom: "1px solid #ddd", padding: 8 }}>ID</th>
+              <th style={{ borderBottom: "1px solid #ddd", padding: 8 }}>序号</th>
               <th style={{ borderBottom: "1px solid #ddd", padding: 8 }}>
                 邮箱
               </th>
@@ -218,7 +231,7 @@ export default function AdminUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {users.map((user, index) => (
               <tr key={user.id}>
                 <td
                   style={{
@@ -227,7 +240,7 @@ export default function AdminUsersPage() {
                     textAlign: "center",
                   }}
                 >
-                  {user.id}
+                  {index + 1}
                 </td>
                 <td
                   style={{
@@ -347,6 +360,96 @@ export default function AdminUsersPage() {
             ))}
           </tbody>
         </table>
+
+          <div
+            style={{
+              marginTop: 16,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: 12,
+              fontSize: 14,
+            }}
+          >
+            <span>
+              第 {page} / {totalPages} 页
+            </span>
+            <button
+              type="button"
+              disabled={page <= 1 || loading}
+              onClick={() => {
+                if (page > 1 && !loading) {
+                  void (async () => {
+                    try {
+                      setLoading(true);
+                      setError(null);
+                      const res = await fetch(
+                        `/api/admin/users?page=${page - 1}`,
+                      );
+                      const data: ApiResponse<AdminUser[]> = await res
+                        .json()
+                        .catch(
+                          () => ({ code: "UNKNOWN_ERROR" } as ApiResponse<AdminUser[]>),
+                        );
+
+                      if (!res.ok || data.code !== "OK" || !data.data) {
+                        setError(data.message ?? "获取用户列表失败");
+                        return;
+                      }
+
+                      setUsers(data.data);
+                      setPage(data.meta?.page ?? page - 1);
+                      setTotalPages(data.meta?.totalPages ?? 1);
+                    } catch {
+                      setError("网络错误，获取用户列表失败");
+                    } finally {
+                      setLoading(false);
+                    }
+                  })();
+                }
+              }}
+            >
+              上一页
+            </button>
+            <button
+              type="button"
+              disabled={page >= totalPages || loading}
+              onClick={() => {
+                if (page < totalPages && !loading) {
+                  void (async () => {
+                    try {
+                      setLoading(true);
+                      setError(null);
+                      const res = await fetch(
+                        `/api/admin/users?page=${page + 1}`,
+                      );
+                      const data: ApiResponse<AdminUser[]> = await res
+                        .json()
+                        .catch(
+                          () => ({ code: "UNKNOWN_ERROR" } as ApiResponse<AdminUser[]>),
+                        );
+
+                      if (!res.ok || data.code !== "OK" || !data.data) {
+                        setError(data.message ?? "获取用户列表失败");
+                        return;
+                      }
+
+                      setUsers(data.data);
+                      setPage(data.meta?.page ?? page + 1);
+                      setTotalPages(data.meta?.totalPages ?? 1);
+                    } catch {
+                      setError("网络错误，获取用户列表失败");
+                    } finally {
+                      setLoading(false);
+                    }
+                  })();
+                }
+              }}
+            >
+              下一页
+            </button>
+          </div>
+        </>
       )}
     </section>
   );

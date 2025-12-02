@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 import { prisma } from "@/lib/db";
@@ -49,7 +49,7 @@ function requireAdmin(
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const auth = requireAdmin(cookieStore);
@@ -61,7 +61,17 @@ export async function GET() {
       });
     }
 
-    const users = await prisma.user.findMany({
+    const searchParams = request.nextUrl.searchParams;
+    const pageParam = searchParams.get("page");
+    const pageSize = 15;
+    const page = Math.max(1, Number(pageParam) || 1);
+    const skip = (page - 1) * pageSize;
+
+    const where = { role: UserRole.USER };
+
+    const [total, users] = await Promise.all([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
       select: {
         id: true,
         email: true,
@@ -84,9 +94,12 @@ export async function GET() {
           take: 1,
         },
       },
-      where: { role: UserRole.USER },
+      where,
       orderBy: { id: "asc" },
-    });
+      skip,
+      take: pageSize,
+    }),
+    ]);
 
     const data = users.map((user) => {
       const active = user.subscriptions[0];
@@ -111,7 +124,12 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ code: "OK", data }, { status: 200 });
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+    return NextResponse.json(
+      { code: "OK", data, meta: { page, pageSize, total, totalPages } },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Admin get users error:", error);
     return NextResponse.json(
