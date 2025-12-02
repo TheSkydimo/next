@@ -1,0 +1,42 @@
+node_modules
+
+# Keep environment variables out of version control
+.env
+.env.local
+.env.*.local
+
+# Next.js build output
+.next/
+out/
+
+# Turbo / Vercel
+.turbo/
+.vercel/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Prisma generated / local databases
+/app/generated/prisma
+prisma/dev.db
+*.sqlite
+*.sqlite-journal
+*.db

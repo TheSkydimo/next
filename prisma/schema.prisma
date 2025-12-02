@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+model User {
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  passwordHash String
+  name         String?
+  role         UserRole           @default(USER)
+
+  isEmailVerified      Boolean   @default(true)
+  emailVerifiedAt      DateTime?
+  verificationCode     String?
+  verificationExpiresAt DateTime?
+
+  subscriptions UserSubscription[]
+  orders        Order[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model MembershipPlan {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Int
+  currency        String
+  billingCycle    BillingCycle
+  features        Json?
+  isActive        Boolean           @default(true)
+
+  subscriptions   UserSubscription[]
+  orders          Order[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+model UserSubscription {
+  id        Int                 @id @default(autoincrement())
+  user      User                @relation(fields: [userId], references: [id])
+  userId    Int
+  plan      MembershipPlan      @relation(fields: [planId], references: [id])
+  planId    Int
+
+  status    SubscriptionStatus
+  startAt   DateTime
+  endAt     DateTime
+  autoRenew Boolean             @default(false)
+
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+model Order {
+  id             Int             @id @default(autoincrement())
+  orderNo        String          @unique
+  user           User            @relation(fields: [userId], references: [id])
+  userId         Int
+  plan           MembershipPlan  @relation(fields: [planId], references: [id])
+  planId         Int
+
+  amount         Int
+  currency       String
+  status         OrderStatus
+  paymentChannel PaymentChannel
+  paymentId      String?
+
+  createdAt      DateTime        @default(now())
+  paidAt         DateTime?
+  updatedAt      DateTime        @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELED
+  REFUNDED
+}
+
+enum PaymentChannel {
+  ALIPAY
+  WECHAT
+  STRIPE
+  PAYPAL
+}
