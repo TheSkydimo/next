@@ -9,9 +9,10 @@ node_modules
 .next/
 out/
 
-# Turbo / Vercel
+# Turbo / Vercel / Cloudflare local state
 .turbo/
 .vercel/
+.wrangler/
 
 # Logs
 logs
