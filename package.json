@@ -21,13 +21,14 @@
     "better-sqlite3": "^12.5.0",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.5",
-    "next": "14.2.23",
+    "next": "^14.2.33",
     "nodemailer": "^7.0.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "latest"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.14.1",
     "@types/node": "latest",
     "@types/nodemailer": "^7.0.4",
     "@types/react": "latest",
