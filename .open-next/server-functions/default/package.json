@@ -9,8 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "dev:cf": "opennextjs-cloudflare preview",
-    "build:cf": "opennextjs-cloudflare build",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "build:cf": "opennextjs-cloudflare build && node scripts/prepare-pages-worker.mjs",
+    "deploy:cf": "opennextjs-cloudflare build && node scripts/prepare-pages-worker.mjs && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.0.1",
