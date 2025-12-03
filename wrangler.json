@@ -6,7 +6,9 @@
     "nodejs_compat",
     "global_fetch_strictly_public"
   ],
-  "pages_build_output_dir": ".open-next",
+  // 对于 Cloudflare Pages，我们直接把构建输出目录指向 .open-next/assets
+  // 这样静态资源根路径下就是 /_next/static/...，同时 assets/_worker.js 会作为入口。
+  "pages_build_output_dir": ".open-next/assets",
   "d1_databases": [
     {
       "binding": "DB",
