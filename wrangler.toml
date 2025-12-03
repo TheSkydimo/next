@@ -1,8 +1,12 @@
 name = "membership-app"
 compatibility_date = "2024-11-01"
 
+# Cloudflare Pages 输出目录（由 @opennextjs/cloudflare 生成）
+pages_build_output_dir = ".open-next"
+
 [[d1_databases]]
-binding = "Database"                # 之后代码里通过 env..Database 访问
-database_name = "membership-db" # 上一步创建的名字
+# 与 `lib/db.ts` 中的 `env.DB` 保持一致
+binding = "DB"
+database_name = "membership-db"
 database_id = "472a47a5-caf7-4317-9eb4-0316de0586f4"
 jurisdiction = "eu"

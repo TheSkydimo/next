@@ -1,7 +1,4 @@
-// default open-next.config.ts file created by @opennextjs/cloudflare
-// import { defineCloudflareConfig } from "@opennextjs/cloudflare/config";
-// import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
+import { defineCloudflareConfig } from "@opennextjs/cloudflare/config";
 
-// export default defineCloudflareConfig({
-// 	incrementalCache: r2IncrementalCache,
-// });
+// 最小 Cloudflare 配置：先保证 OpenNext 配置对象非空，后续需要再扩展
+export default defineCloudflareConfig({});

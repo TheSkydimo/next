@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-export const runtime = "edge";
-
 type Plan = {
   id: number;
   name: string;
@@ -12,10 +10,8 @@ type Plan = {
 };
 
 async function fetchPlans(): Promise<Plan[]> {
-  const res = await fetch("http://localhost:3000/api/membership/plans", {
-    // 简单示例，后续可改为使用相对 URL + Next.js fetch 缓存
-    cache: "no-store",
-  });
+  // 使用相对 URL，确保在 Cloudflare / 生产环境下也能正确访问到 API
+  const res = await fetch("/api/membership/plans", { cache: "no-store" });
   if (!res.ok) {
     return [];
   }

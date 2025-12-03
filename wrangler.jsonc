@@ -13,7 +13,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "Database",
+			"binding": "DB",
 			"database_name": "membership-db",
 			"database_id": "472a47a5-caf7-4317-9eb4-0316de0586f4"
 		}
