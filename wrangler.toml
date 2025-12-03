@@ -1,12 +1,2 @@
-name = "membership-app"
-compatibility_date = "2024-11-01"
-
-# Cloudflare Pages 输出目录（由 @opennextjs/cloudflare 生成）
-pages_build_output_dir = ".open-next"
-
-[[d1_databases]]
-# 与 `lib/db.ts` 中的 `env.DB` 保持一致
-binding = "DB"
-database_name = "membership-db"
-database_id = "472a47a5-caf7-4317-9eb4-0316de0586f4"
-jurisdiction = "eu"
+# 对于 Cloudflare Pages v2，我们主要使用 wrangler.json 来配置。
+# 保留一个最小且无效的 wrangler.toml 以避免本地 wrangler 误读。

@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "membership-app",
+  "compatibility_date": "2024-11-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "pages_build_output_dir": ".open-next",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "membership-db",
+      "database_id": "472a47a5-caf7-4317-9eb4-0316de0586f4"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
+
+
