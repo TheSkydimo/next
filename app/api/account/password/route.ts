@@ -4,7 +4,7 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { changeUserPassword } from "@/lib/services/accountService";
 import { changePasswordInputSchema } from "@/lib/utils/accountValidators";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     const json = await request.json().catch(() => ({}));
     const parsed = changePasswordInputSchema.safeParse(json);

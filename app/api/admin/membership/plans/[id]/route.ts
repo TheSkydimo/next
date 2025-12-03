@@ -16,11 +16,11 @@ type AdminAuthError = {
   error: { status: number; body: { code: string; message: string } };
 };
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
-function requireAdmin(
+async function requireAdmin(
   requestCookies: Awaited<ReturnType<typeof cookies>>,
-): AdminAuthSuccess | AdminAuthError {
+): Promise<AdminAuthSuccess | AdminAuthError> {
   const token = requestCookies.get("auth_token")?.value;
 
   if (!token) {
@@ -28,7 +28,7 @@ function requireAdmin(
   }
 
   try {
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     if (payload.role !== "ADMIN") {
       return {
@@ -60,7 +60,7 @@ export async function PATCH(
 ) {
   try {
     const cookieStore = await cookies();
-    const auth = requireAdmin(cookieStore);
+    const auth = await requireAdmin(cookieStore);
 
     if ("error" in auth) {
       const { error } = auth;
@@ -135,7 +135,7 @@ export async function PATCH(
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const cookieStore = await cookies();
-    const auth = requireAdmin(cookieStore);
+    const auth = await requireAdmin(cookieStore);
 
     if ("error" in auth) {
       return NextResponse.json(auth.error.body, { status: auth.error.status });

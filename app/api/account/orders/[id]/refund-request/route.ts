@@ -7,7 +7,7 @@ type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(_request: NextRequest, { params }: RouteParams) {
   try {
@@ -21,7 +21,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     const { id: idStr } = await params;
     const orderId = Number(idStr);

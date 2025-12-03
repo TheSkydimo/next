@@ -5,7 +5,7 @@ import { createOrderForUser } from "@/lib/services/orderService";
 import { logger } from "@/lib/utils/logger";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     const { order, paymentUrl } = await createOrderForUser(
       payload.userId,

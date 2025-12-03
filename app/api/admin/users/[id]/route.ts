@@ -9,9 +9,9 @@ type AdminAuthError = {
   error: { status: number; body: { code: string; message: string } };
 };
 
-function requireAdmin(
+async function requireAdmin(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
-): AdminAuthSuccess | AdminAuthError {
+): Promise<AdminAuthSuccess | AdminAuthError> {
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) {
@@ -24,7 +24,7 @@ function requireAdmin(
   }
 
   try {
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     if (payload.role !== "ADMIN") {
       return {
@@ -53,7 +53,7 @@ type RouteParams = {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const cookieStore = await cookies();
-    const auth = requireAdmin(cookieStore);
+    const auth = await requireAdmin(cookieStore);
 
     if ("error" in auth) {
       const { error } = auth;
@@ -120,7 +120,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const cookieStore = await cookies();
-    const auth = requireAdmin(cookieStore);
+    const auth = await requireAdmin(cookieStore);
 
     if ("error" in auth) {
       const { error } = auth;

@@ -4,7 +4,7 @@ import { authenticateUser } from "@/lib/services/authService";
 import { signAuthToken } from "@/lib/utils/jwt";
 import { cookies } from "next/headers";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     const user = await authenticateUser(parsed.data);
-    const token = signAuthToken({ userId: user.id, role: user.role });
+    const token = await signAuthToken({ userId: user.id, role: user.role });
 
     const cookieStore = await cookies();
     cookieStore.set("auth_token", token, {

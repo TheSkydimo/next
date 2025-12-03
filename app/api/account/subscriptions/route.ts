@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 import { listSubscriptionsForUser } from "@/lib/services/subscriptionService";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
@@ -17,7 +17,7 @@ export async function GET() {
       );
     }
 
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     const subscriptions = await listSubscriptionsForUser(payload.userId);
 

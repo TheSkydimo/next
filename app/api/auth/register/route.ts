@@ -3,7 +3,7 @@ import { registerInputSchema } from "@/lib/utils/authValidators";
 import { registerUser } from "@/lib/services/authService";
 import { sendVerificationEmail } from "@/lib/services/emailService";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {

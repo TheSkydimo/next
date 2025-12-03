@@ -8,7 +8,7 @@ interface VerifyEmailInput {
   code: string;
 }
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -69,7 +69,10 @@ export async function POST(request: Request) {
       },
     });
 
-    const token = signAuthToken({ userId: updated.id, role: updated.role });
+    const token = await signAuthToken({
+      userId: updated.id,
+      role: updated.role,
+    });
 
     const cookieStore = await cookies();
     cookieStore.set("auth_token", token, {

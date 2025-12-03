@@ -4,7 +4,7 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { updateUserProfile } from "@/lib/services/accountService";
 import { updateProfileInputSchema } from "@/lib/utils/accountValidators";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function PATCH(request: Request) {
   try {
@@ -18,7 +18,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const payload = verifyAuthToken(token);
+    const payload = await verifyAuthToken(token);
 
     const json = await request.json().catch(() => ({}));
     const parsed = updateProfileInputSchema.safeParse(json);

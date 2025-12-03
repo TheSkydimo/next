@@ -4,7 +4,7 @@ import { resetPasswordInputSchema } from "@/lib/utils/authValidators";
 import { resetPasswordWithCode } from "@/lib/services/authService";
 import { signAuthToken } from "@/lib/utils/jwt";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     const user = await resetPasswordWithCode(parsed.data);
 
-    const token = signAuthToken({ userId: user.id, role: user.role });
+    const token = await signAuthToken({ userId: user.id, role: user.role });
 
     const cookieStore = await cookies();
     cookieStore.set("auth_token", token, {

@@ -6,7 +6,7 @@ import {
 import { logger } from "@/lib/utils/logger";
 import { BillingCycle } from "@/app/generated/prisma/client";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
