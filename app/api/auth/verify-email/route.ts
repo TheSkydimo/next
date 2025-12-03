@@ -8,6 +8,8 @@ interface VerifyEmailInput {
   code: string;
 }
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const json = (await request.json().catch(() => ({}))) as VerifyEmailInput;

@@ -4,6 +4,8 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { requestEmailChange } from "@/lib/services/accountService";
 import { requestEmailChangeInputSchema } from "@/lib/utils/accountValidators";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();

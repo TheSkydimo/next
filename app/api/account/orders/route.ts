@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 import { listOrdersForUser } from "@/lib/services/orderService";
 
+export const runtime = "edge";
+
 export async function GET() {
   try {
     const cookieStore = await cookies();

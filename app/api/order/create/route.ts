@@ -5,6 +5,8 @@ import { createOrderForUser } from "@/lib/services/orderService";
 import { logger } from "@/lib/utils/logger";
 import { verifyAuthToken } from "@/lib/utils/jwt";
 
+export const runtime = "edge";
+
 export async function POST(request: NextRequest) {
   try {
     const json = await request.json();

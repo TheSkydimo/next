@@ -7,6 +7,8 @@ type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
+export const runtime = "edge";
+
 export async function POST(_request: NextRequest, { params }: RouteParams) {
   try {
     const cookieStore = await cookies();

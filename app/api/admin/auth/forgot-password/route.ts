@@ -3,6 +3,8 @@ import { forgotPasswordInputSchema } from "@/lib/utils/authValidators";
 import { issueAdminPasswordResetCode } from "@/lib/services/authService";
 import { sendVerificationEmail } from "@/lib/services/emailService";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const json = await request.json();

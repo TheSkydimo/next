@@ -4,6 +4,8 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { changeUserPassword } from "@/lib/services/accountService";
 import { changePasswordInputSchema } from "@/lib/utils/accountValidators";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();

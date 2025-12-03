@@ -4,6 +4,8 @@ import { verifyAuthToken } from "@/lib/utils/jwt";
 import { updateUserProfile } from "@/lib/services/accountService";
 import { updateProfileInputSchema } from "@/lib/utils/accountValidators";
 
+export const runtime = "edge";
+
 export async function PATCH(request: Request) {
   try {
     const cookieStore = await cookies();

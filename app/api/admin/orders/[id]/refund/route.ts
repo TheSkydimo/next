@@ -12,6 +12,8 @@ type AdminAuthError = {
   error: { status: number; body: { code: string; message: string } };
 };
 
+export const runtime = "edge";
+
 function requireAdmin(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
 ): AdminAuthSuccess | AdminAuthError {

@@ -4,6 +4,8 @@ import { resetPasswordInputSchema } from "@/lib/utils/authValidators";
 import { resetAdminPasswordWithCode } from "@/lib/services/authService";
 import { signAuthToken } from "@/lib/utils/jwt";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const json = await request.json();
