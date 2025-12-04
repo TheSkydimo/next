@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
 
     const where = { role: UserRole.USER };
 
+    const prisma = getPrismaClient();
     const [total, users] = await Promise.all([
       prisma.user.count({ where }),
       prisma.user.findMany({
