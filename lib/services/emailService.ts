@@ -26,18 +26,14 @@ function createTransporter() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
+  // 若未配置 SMTP，则回退为控制台输出模式。
+  // 在生产环境下也允许这样运行，以避免因邮件配置缺失导致接口报 500。
   if (!host || !user || !pass) {
-    if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "[EmailService] SMTP 配置缺失，已回退为控制台输出模式（仅开发环境）。",
-      );
-      return null;
-    }
-
-    throw new Error(
-      "[EmailService] SMTP 配置缺失，请在生产环境中配置 SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS。",
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[EmailService] 未检测到 SMTP 配置，邮件将打印到控制台而非实际发送。",
     );
+    return null;
   }
 
   const secure =
