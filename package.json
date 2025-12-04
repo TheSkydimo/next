@@ -8,9 +8,9 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
-    "dev:cf": "opennextjs-cloudflare preview",
-    "build:cf": "opennextjs-cloudflare build && node scripts/prepare-pages-worker.mjs",
-    "deploy:cf": "opennextjs-cloudflare build && node scripts/prepare-pages-worker.mjs && opennextjs-cloudflare deploy"
+    "dev:cf": "opennextjs-cloudflare preview --config wrangler.open-next.jsonc",
+    "build:cf": "opennextjs-cloudflare build --config wrangler.open-next.jsonc && node scripts/prepare-pages-worker.mjs",
+    "deploy:cf": "opennextjs-cloudflare build --config wrangler.open-next.jsonc && node scripts/prepare-pages-worker.mjs && opennextjs-cloudflare deploy --config wrangler.open-next.jsonc"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.0.1",
