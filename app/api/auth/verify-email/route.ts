@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 import { signAuthToken } from "@/lib/utils/jwt";
 
 interface VerifyEmailInput {
@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const prisma = getPrismaClient();
     const user = await prisma.user.findUnique({
       where: { email },
     });

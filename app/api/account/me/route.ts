@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -19,6 +19,7 @@ export async function GET() {
 
     const payload = await verifyAuthToken(token);
 
+    const prisma = getPrismaClient();
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       select: {

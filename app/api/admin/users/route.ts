@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/utils/jwt";
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 import {
   SubscriptionStatus,
   UserRole,
@@ -29,6 +29,7 @@ async function requireAdmin(
   }
 
   try {
+    const prisma = getPrismaClient();
     const payload = await verifyAuthToken(token);
 
     if (payload.role !== "ADMIN") {

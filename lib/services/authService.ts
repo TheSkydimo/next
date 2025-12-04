@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 import type {
   ForgotPasswordInput,
   LoginInput,
@@ -13,6 +13,7 @@ const DEV_ADMIN_EMAIL = "admin@example.com";
 const DEV_ADMIN_NAME = "开发管理员";
 
 export async function registerUser(input: RegisterInput) {
+  const prisma = getPrismaClient();
   const existing = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -51,6 +52,7 @@ async function ensureDevAdminUser(email: string, password: string) {
     return null;
   }
 
+  const prisma = getPrismaClient();
   let user = await prisma.user.findUnique({
     where: { email },
   });
@@ -74,6 +76,7 @@ async function ensureDevAdminUser(email: string, password: string) {
 }
 
 export async function authenticateUser(input: LoginInput) {
+  const prisma = getPrismaClient();
   let user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -97,6 +100,7 @@ export async function authenticateUser(input: LoginInput) {
 }
 
 export async function issuePasswordResetCode(input: ForgotPasswordInput) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -121,6 +125,7 @@ export async function issuePasswordResetCode(input: ForgotPasswordInput) {
 }
 
 export async function resetPasswordWithCode(input: ResetPasswordInput) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -159,6 +164,7 @@ export async function resetPasswordWithCode(input: ResetPasswordInput) {
 export async function issueAdminPasswordResetCode(
   input: ForgotPasswordInput,
 ) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -184,6 +190,7 @@ export async function issueAdminPasswordResetCode(
 export async function resetAdminPasswordWithCode(
   input: ResetPasswordInput,
 ) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });

@@ -1,22 +1,37 @@
-   // lib/db.ts
-   import { PrismaClient } from "@/app/generated/prisma/client";
-   import { PrismaD1 } from "@prisma/adapter-d1";
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaD1 } from "@prisma/adapter-d1";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-   // Cloudflare Pages/Workers provides `env` at runtime; declare for TS
-   interface D1Database {}
-   declare const env: { DB: D1Database };
+type D1Database = unknown;
 
-// 在 Node.js 本地构建 / 运行时，`env` 不存在；在 Cloudflare Workers 中由平台注入。
-// 使用 typeof 检查可以避免在 Next 构建阶段访问未定义的全局变量导致 ReferenceError。
-const hasD1Env =
-  typeof env !== "undefined" &&
-  !!(env as { DB?: D1Database }).DB;
+let prisma: PrismaClient | null = null;
 
-const adapter = hasD1Env
-  ? new PrismaD1({
-     fetch: (...args: Parameters<typeof fetch>) => fetch(...args), // Workers' global fetch
-      database: (env as { DB: D1Database }).DB,
-    })
-  : undefined;
+function createPrismaClient(): PrismaClient {
+  // 优先尝试 Cloudflare D1 适配（生产环境）
+  try {
+    const { env } = getCloudflareContext();
+    const db = (env as { DB?: D1Database }).DB;
 
-export const prisma = new PrismaClient(adapter ? { adapter } : undefined);
+    if (db) {
+      const adapter = new PrismaD1({
+        // 使用 Workers 提供的全局 fetch
+        fetch: (...args: Parameters<typeof fetch>) => fetch(...args),
+        database: db,
+      });
+
+      return new PrismaClient({ adapter });
+    }
+  } catch {
+    // 在本地开发或没有 Cloudflare 上下文时会走到这里，回退到默认 PrismaClient
+  }
+
+  // 本地开发：使用 DATABASE_URL / sqlite
+  return new PrismaClient();
+}
+
+export function getPrismaClient(): PrismaClient {
+  if (!prisma) {
+    prisma = createPrismaClient();
+  }
+  return prisma;
+}
