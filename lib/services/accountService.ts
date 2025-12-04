@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 import {
   type UpdateProfileInput,
   type ChangePasswordInput,
@@ -13,6 +13,7 @@ export async function updateUserProfile(
   userId: number,
   input: UpdateProfileInput,
 ) {
+  const prisma = getPrismaClient();
   const data: { name?: string } = {};
 
   if (typeof input.name === "string") {
@@ -51,6 +52,7 @@ export async function changeUserPassword(
   userId: number,
   input: ChangePasswordInput,
 ) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -78,6 +80,7 @@ export async function requestEmailChange(
   userId: number,
   input: RequestEmailChangeInput,
 ) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -117,6 +120,7 @@ export async function confirmEmailChange(
   userId: number,
   input: ConfirmEmailChangeInput,
 ) {
+  const prisma = getPrismaClient();
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });

@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { getPrismaClient } from "@/lib/db";
 import { generateOrderNo } from "@/lib/utils/idGenerator";
 import {
   OrderStatus,
@@ -9,6 +9,7 @@ import {
  * 为指定用户创建订单
  */
 export async function createOrderForUser(userId: number, planId: number) {
+  const prisma = getPrismaClient();
   const plan = await prisma.membershipPlan.findUnique({
     where: { id: planId, isActive: true },
   });
@@ -41,6 +42,7 @@ export async function createOrderForUser(userId: number, planId: number) {
  * 查询指定用户的订单列表（含关联套餐信息），按创建时间倒序
  */
 export async function listOrdersForUser(userId: number) {
+  const prisma = getPrismaClient();
   return prisma.order.findMany({
     where: { userId },
     include: {
@@ -60,6 +62,7 @@ export async function listOrdersForUser(userId: number) {
  * - 只能取消状态为 PENDING（待支付）的订单
  */
 export async function cancelOrderForUser(orderId: number, userId: number) {
+  const prisma = getPrismaClient();
   const order = await prisma.order.findUnique({
     where: { id: orderId },
   });
@@ -100,6 +103,7 @@ export async function requestRefundForUser(
   orderId: number,
   userId: number,
 ) {
+  const prisma = getPrismaClient();
   const order = await prisma.order.findUnique({
     where: { id: orderId },
   });
@@ -137,6 +141,7 @@ export async function requestRefundForUser(
  * 管理员同意退款，将订单标记为已退款
  */
 export async function approveRefundForOrder(orderId: number) {
+  const prisma = getPrismaClient();
   const order = await prisma.order.findUnique({
     where: { id: orderId },
   });
