@@ -25,7 +25,10 @@
 	],
 	"observability": {
 		"enabled": true
-	}
+	},
+	"vars": {
+    "PRISMA_WASM_BASE_URL": "https://8cf98fd3.next-epm.pages.dev"
+  }
 }
 
 
