@@ -9,6 +9,8 @@ datasource db {
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
+  // 让 Prisma Client 按 Cloudflare Workers 运行时生成，避免依赖 node:os 等 Node 内置模块
+  runtime  = "cloudflare"
 }
 
 model User {
