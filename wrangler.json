@@ -8,6 +8,17 @@
   ],
   // 对于 Cloudflare Pages，我们直接把构建输出目录指向 .open-next/assets
   // 这样静态资源根路径下就是 /_next/static/...，同时 assets/_worker.js 会作为入口。
+  // 下方 assets 配置仅用于 OpenNext 读取 run_worker_first 规则，注入到 __ASSETS_RUN_WORKER_FIRST__，
+  // 让 /_next/static/... 这类请求在 Worker 中优先走 ASSETS.fetch。
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets",
+    "run_worker_first": [
+      "/_next/static/*",
+      "/favicon.ico",
+      "/robots.txt"
+    ]
+  },
   "pages_build_output_dir": ".open-next/assets",
   "d1_databases": [
     {
