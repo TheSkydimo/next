@@ -41,3 +41,4 @@ prisma/dev.db
 *.sqlite
 *.sqlite-journal
 *.db
+.open-next/

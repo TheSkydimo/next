@@ -44,8 +44,6 @@ async function main() {
   const before = source.slice(0, startIndex);
   const after = source.slice(endIndex);
 
-  const BASE_URL_LITERAL = process.env.PRISMA_WASM_BASE_URL ?? "";
-
   const replacement = `config.engineWasm = {
   getRuntime: async () => await import("./query_engine_bg.js"),
 
@@ -68,9 +66,20 @@ async function main() {
     // @ts-ignore - Webpack replaces this with a string URL to the emitted asset.
     const asset = new URL("./query_engine_bg.wasm", import.meta.url);
 
+    const base =
+      (typeof process !== "undefined" &&
+        typeof process.env !== "undefined" &&
+        process.env.PRISMA_WASM_BASE_URL) ||
+      (typeof globalThis !== "undefined" &&
+        // @ts-ignore - globalThis env injection at runtime (Cloudflare / Node compat)
+        globalThis.PRISMA_WASM_BASE_URL) ||
+      undefined;
+
     const wasmUrl =
-      typeof asset === "string"
-        ? new URL(asset, "${BASE_URL_LITERAL}" || import.meta.url)
+      typeof asset === "string" && base
+        ? new URL(asset, base)
+        : typeof asset === "string"
+        ? new URL(asset, import.meta.url)
         : asset;
 
     const response = await fetch(wasmUrl);
