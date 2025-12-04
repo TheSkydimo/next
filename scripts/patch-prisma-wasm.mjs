@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 目标文件：Prisma 生成的 Cloudflare WASM Client
+// Prisma Cloudflare WASM engine loader file
 const TARGET_PATH = path.join(
   __dirname,
   "..",
@@ -48,44 +48,39 @@ async function main() {
   getRuntime: async () => await import("./query_engine_bg.js"),
 
   getQueryEngineWasmModule: async () => {
-    // NOTE:
-    // The default Prisma Client for the \`cloudflare\` runtime imports
-    // \`query_engine_bg.wasm?module\`, which causes Webpack (used by Next.js)
-    // to parse the WASM binary. On some platforms this fails with:
-    //
-    //   "Module parse failed: Internal failure: parseVec could not cast the value"
-    //
-    // To avoid letting Webpack parse the binary at build time, we instead:
-    //   1. Treat the WASM file as a plain asset using \`new URL(..., import.meta.url)\`
-    //   2. Fetch its bytes at runtime
-    //   3. Compile it with \`WebAssembly.compile\`
-    //
-    // This works in both Node.js (Next.js dev / build) and Cloudflare Workers,
-    // and keeps the engine fully functional.
-
-    // @ts-ignore - Webpack replaces this with a string URL to the emitted asset.
+    // Use bundler-provided WASM asset URL.
+    // In Cloudflare this usually becomes a string or URL object.
+    // @ts-ignore
     const asset = new URL("./query_engine_bg.wasm", import.meta.url);
 
+    const assetStr = typeof asset === "string" ? asset : asset.toString();
+
     const base =
+      (typeof globalThis !== "undefined" &&
+        // @ts-ignore - global injected var in _worker.js
+        globalThis.PRISMA_WASM_BASE_URL) ||
       (typeof process !== "undefined" &&
         typeof process.env !== "undefined" &&
         process.env.PRISMA_WASM_BASE_URL) ||
-      (typeof globalThis !== "undefined" &&
-        // @ts-ignore - globalThis env injection at runtime (Cloudflare / Node compat)
-        globalThis.PRISMA_WASM_BASE_URL) ||
       undefined;
 
-    const wasmUrl =
-      typeof asset === "string" && base
-        ? new URL(asset, base)
-        : typeof asset === "string"
-        ? new URL(asset, import.meta.url)
-        : asset;
+    let wasmUrlStr;
 
-    const response = await fetch(wasmUrl);
+    if (/^https?:\\/\\//i.test(assetStr)) {
+      // bundler already produced an absolute URL
+      wasmUrlStr = assetStr;
+    } else if (base) {
+      // Cloudflare runtime: force absolute URL
+      wasmUrlStr = new URL(assetStr, base).toString();
+    } else {
+      // fallback: construct relative to import.meta.url
+      wasmUrlStr = new URL(assetStr, import.meta.url).toString();
+    }
+
+    const response = await fetch(wasmUrlStr);
     if (!response.ok) {
       throw new Error(
-        \`Failed to load Prisma query engine WASM from "\${wasmUrl}": \${response.status} \${response.statusText}\`,
+        \`Failed to load Prisma query engine WASM from "\${wasmUrlStr}": \${response.status} \${response.statusText}\`
       );
     }
 
@@ -110,5 +105,3 @@ main().catch((error) => {
   );
   process.exitCode = 1;
 });
-
-
