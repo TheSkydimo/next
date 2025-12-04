@@ -69,8 +69,8 @@ async function main() {
     const asset = new URL("./query_engine_bg.wasm", import.meta.url);
 
     const wasmUrl =
-      typeof asset === "string" && "${BASE_URL_LITERAL}"
-        ? new URL(asset, "${BASE_URL_LITERAL}")
+      typeof asset === "string"
+        ? new URL(asset, "${BASE_URL_LITERAL}" || import.meta.url)
         : asset;
 
     const response = await fetch(wasmUrl);
