@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && node scripts/patch-prisma-wasm.mjs",
     "start": "next start",
     "lint": "next lint",
     "dev:cf": "opennextjs-cloudflare preview --config wrangler.open-next.jsonc",
