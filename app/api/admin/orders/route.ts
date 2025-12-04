@@ -61,6 +61,7 @@ export async function GET() {
       });
     }
 
+    const prisma = getPrismaClient();
     const orders = await prisma.order.findMany({
       include: {
         plan: true,
