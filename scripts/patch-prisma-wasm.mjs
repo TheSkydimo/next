@@ -61,22 +61,16 @@ async function main() {
 
     if (base) {
       // Cloudflare Pages / Workers:
-      // We copy the entire \`.open-next/server-functions\` 目录到
-      // \`.open-next/assets/server-functions\`（见 \`scripts/prepare-pages-worker.mjs\`），
-      // 所以在运行时可以通过 HTTP 访问：
-      //   https://<domain>/server-functions/default/app/generated/prisma/internal/query_engine_bg.wasm
-      //
-      // 这里显式使用这个稳定路径，而不是依赖 Webpack 生成的
-      // \`/_next/static/media/query_engine_bg.[hash].wasm\`，因为那个文件并不会被
-      // OpenNext 复制到 Pages 静态资源目录中。
+      // see \`scripts/prepare-pages-worker.mjs\` — we copy Prisma WASM into
+      //   .open-next/assets/_next/static/prisma/query_engine_bg.wasm
+      // so that it is publicly accessible at:
+      //   https://<domain>/_next/static/prisma/query_engine_bg.wasm
       wasmUrlStr = new URL(
-        "/server-functions/default/app/generated/prisma/internal/query_engine_bg.wasm",
+        "/_next/static/prisma/query_engine_bg.wasm",
         base,
       ).toString();
     } else {
       // 本地开发 / 其它环境：退回 Prisma 默认逻辑（由运行时自行解析 WASM）。
-      // 注意：这里我们避免使用 Webpack 的 \`new URL(..., import.meta.url)\` 结果，
-      // 因为在非 Cloudflare 环境下，Next.js 自己会处理 WASM 资源的加载。
       // @ts-ignore
       const asset = new URL("./query_engine_bg.wasm", import.meta.url);
       const assetStr = typeof asset === "string" ? asset : asset.toString();
