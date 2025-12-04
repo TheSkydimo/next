@@ -95,6 +95,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    const prisma = getPrismaClient();
     const updated = await prisma.user.update({
       where: { id },
       data,
@@ -149,6 +150,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     const now = new Date();
 
+    const prisma = getPrismaClient();
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
