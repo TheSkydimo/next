@@ -61,6 +61,7 @@ export async function GET() {
       });
     }
 
+    const prisma = getPrismaClient();
     const admins = await prisma.user.findMany({
       where: { role: UserRole.ADMIN },
       select: {
