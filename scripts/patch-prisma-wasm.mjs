@@ -64,7 +64,24 @@ async function main() {
     // and keeps the engine fully functional.
 
     // @ts-ignore - Webpack replaces this with a string URL to the emitted asset.
-    const wasmUrl = new URL("./query_engine_bg.wasm", import.meta.url);
+    const asset = new URL("./query_engine_bg.wasm", import.meta.url);
+
+    // In Cloudflare Workers / Pages, fetch() requires an absolute URL when
+    // given a string. After bundling, \`asset\` is typically a string like
+    // "/_next/static/media/query_engine_bg.XXXXX.wasm". We normalize it to
+    // an absolute URL when we know the deployment origin from env vars.
+    const baseFromEnv =
+      typeof process !== "undefined" && process.env
+        ? process.env.PRISMA_WASM_BASE_URL
+          || process.env.CF_PAGES_URL
+          || process.env.NEXT_PUBLIC_SITE_URL
+          || process.env.NEXTAUTH_URL
+        : undefined;
+
+    const wasmUrl =
+      typeof asset === "string" && baseFromEnv
+        ? new URL(asset, baseFromEnv)
+        : asset;
 
     const response = await fetch(wasmUrl);
     if (!response.ok) {
